@@ -20,6 +20,12 @@ public class FlowView extends ViewGroup {
 
     private int childPadding = 15;
 
+    private OnFlowItemClick onFlowItemClick;
+
+    public void setOnFlowItemClick(OnFlowItemClick onFlowItemClick) {
+        this.onFlowItemClick = onFlowItemClick;
+    }
+
     public FlowView(Context context) {
         this(context, null);
     }
@@ -51,7 +57,7 @@ public class FlowView extends ViewGroup {
 
         int lines = 0;//布局到第几行
         for (int i = 0; i < childCount; i++) {
-            Log.e("xkff", "onLayout============="+l+"======="+t);
+            Log.e("xkff", "onLayout=============" + l + "=======" + t);
             View childAt = getChildAt(i);
             int childRight = left + childAt.getMeasuredWidth();
             int childBottom = top + childAt.getMeasuredHeight();
@@ -67,7 +73,7 @@ public class FlowView extends ViewGroup {
 
             if (childBottom <= bottom) {
                 //减去父控件的起始坐标
-                childAt.layout(left-l, top - t, childRight - l, childBottom - t);
+                childAt.layout(left - l, top - t, childRight - l, childBottom - t);
                 left += childAt.getMeasuredWidth() + childPadding;
 
             }
@@ -94,8 +100,21 @@ public class FlowView extends ViewGroup {
         for (int i = 0; i < texts.size(); i++) {
             TextView textView = (TextView) inflater.inflate(R.layout.item_flow, this, false);
             textView.setText(texts.get(i));
+            final int position = i;
+            textView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onFlowItemClick != null) {
+                        onFlowItemClick.onItemClick(position);
+                    }
+                }
+            });
             this.addView(textView);
         }
         requestLayout();
+    }
+
+    public interface OnFlowItemClick {
+        void onItemClick(int position);
     }
 }
