@@ -42,8 +42,6 @@ public class FlowView extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //measureChildBeforeLayout(widthMeasureSpec, heightMeasureSpec);
-
         measureChildren(widthMeasureSpec, heightMeasureSpec);
 
         int wSpecMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -61,7 +59,7 @@ public class FlowView extends ViewGroup {
 
         if (hSpecMode==MeasureSpec.AT_MOST)
         {
-            hResult  = Math.min(wResult, getChildTotalHeight(wResult));
+            hResult  = Math.min(hResult, getChildTotalHeight(wResult));
         }
         setMeasuredDimension(wResult, hResult);
 
