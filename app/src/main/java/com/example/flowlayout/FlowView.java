@@ -19,7 +19,8 @@ public class FlowView extends ViewGroup {
      */
 
     private int childPadding = 15;
-
+    private float mHorizontalSpace=childPadding;
+    private float mVerticalSpace=childPadding;
     private OnFlowItemClick onFlowItemClick;
 
     public void setOnFlowItemClick(OnFlowItemClick onFlowItemClick) {
@@ -41,10 +42,114 @@ public class FlowView extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        //measureChildBeforeLayout(widthMeasureSpec, heightMeasureSpec);
+
         measureChildren(widthMeasureSpec, heightMeasureSpec);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int wSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+        int wSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+        int wResult = wSpecSize;
+
+        if (wSpecMode==MeasureSpec.AT_MOST)
+        {
+            wResult = Math.min(wResult, getChildTotalWidth());
+        }
+
+        int hSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+        int hSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+        int hResult = hSpecSize;
+
+        if (hSpecMode==MeasureSpec.AT_MOST)
+        {
+            hResult  = Math.min(wResult, getChildTotalHeight(wResult));
+        }
+        setMeasuredDimension(wResult, hResult);
+
+//        measureChildren(widthMeasureSpec, heightMeasureSpec);
+//
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         Log.e("xkff", "onMeasure=============");
 
+    }
+
+    private int getChildTotalWidth(){
+        int totalWidth = getPaddingLeft() + getPaddingRight();
+        for (int i=0;i<getChildCount();i++) {
+            View child = getChildAt(i);
+            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+            if (View.GONE == child.getVisibility()) continue;
+
+            totalWidth += child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin;
+        }
+        /*horizontal方向的间距为控件个数-1*/
+        totalWidth += mHorizontalSpace * (getChildCount() - 1);
+        return totalWidth;
+    }
+
+    private int getChildTotalHeight(int maxWidth) {
+
+        int totalHeight = getTop() + getBottom();
+        int colIndex = 0;
+        int rowIndex = 0;
+        int rowWidth = getPaddingLeft() + getPaddingRight();
+        int rowHeight = 0;
+
+        for (int i=0;i<getChildCount();i++)
+        {
+            View child = getChildAt(i);
+            if (View.GONE == child.getVisibility()) continue;
+
+            int childWidth = child.getMeasuredWidth();
+            int childHeight = child.getMeasuredHeight();
+
+            if (colIndex == 0) {
+                if (rowWidth + childWidth > maxWidth) {
+                    totalHeight += childHeight;
+                    if (rowIndex != 0) {
+                        totalHeight += mVerticalSpace;
+                    }
+                    rowWidth = getPaddingLeft() + getPaddingRight();
+                    rowHeight = 0;
+                    rowIndex++;
+                } else {
+                    colIndex++;
+                    rowWidth += childWidth;
+                    if (rowIndex == 0) {
+                        rowHeight = Math.max(rowHeight, childHeight);
+                    } else {
+                        rowHeight = (int) Math.max(rowHeight, childHeight + mVerticalSpace);
+                    }
+                }
+            } else {
+                if (rowWidth + childWidth + mHorizontalSpace > maxWidth) {
+                    totalHeight += rowHeight;
+                    rowWidth = getPaddingLeft() + getPaddingRight() + childWidth;
+                    rowHeight = (int) (childHeight + mVerticalSpace);
+                    colIndex = 1;
+                    rowIndex++;
+                } else {
+                    colIndex++;
+                    rowWidth += childWidth + mHorizontalSpace;
+                    if (rowIndex == 0) {
+                        rowHeight = Math.max(rowHeight, childHeight);
+                    } else {
+                        rowHeight = (int) Math.max(rowHeight, childHeight + mVerticalSpace);
+                    }
+                }
+            }
+        }
+
+        totalHeight += rowHeight;
+        return totalHeight;
+    }
+
+    private void measureChildBeforeLayout(int widthMeasureSpec, int heightMeasureSpec) {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            if (View.GONE == child.getVisibility()) continue;
+            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+        }
     }
 
     @Override

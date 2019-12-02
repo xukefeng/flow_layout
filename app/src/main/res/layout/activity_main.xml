@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
   <com.example.flowlayout.FlowView
       android:id="@+id/flowView"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginLeft="10dp"
-      android:layout_marginTop="20dp"/>
+      android:layout_height="wrap_content"/>
 <TextView
+    android:id="@+id/tv"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_below="@id/flowView"
-    android:text="sdfffffffffffffff"/>
-</RelativeLayout>
+    android:text="123444"/>
+</LinearLayout>
